@@ -27,7 +27,7 @@ class Client:
     def resp_data(self, country_code):
         desired_timezone = pytz.timezone('UTC')
         current_date = datetime.now(desired_timezone)
-        if (self.response_list.get(country_code) is not None) and (current_date - self.sessionAt.get(country_code, datetime.now())) < timedelta(hours=4):
+        if (self.response_list.get(country_code) is not None) and (current_date - self.sessionAt.get(country_code, current_date)) < timedelta(hours=4):
             return self.response_list[country_code], None
 
         boot_headers = {
@@ -201,6 +201,8 @@ class Client:
                     offset = 8000
                     if number < offset:
                         number += offset
+                case _:
+                    pass
             while number in seen:
                 number += 1
             seen.add(number)
@@ -349,7 +351,6 @@ class Client:
             ("Biography",): ["Biographical Documentaries", "Inspirational Biographies"],
             ("Science Fiction",): ["Sci-Fi Thrillers", "Sci-Fi Adventure", "Action Sci-Fi & Fantasy"],
             ("Thriller",): ["Sci-Fi Thrillers", "Thrillers", "Crime Thrillers"],
-            ("Biography",): ["Biographical Documentaries", "Inspirational Biographies"],
             ("Talk",): ["Talk & Variety", "Talk Show"],
             ("Variety",): ["Sketch Comedies"],
             ("Home Improvement",): ["Art & Design", "DIY & How To", "Home Improvement"],
@@ -390,7 +391,6 @@ class Client:
                   "Crime Drama",
                 ],
             ("Children",): ["Kids", "Children & Family", "Kids' TV", "Cartoons", "Animals", "Family Animation", "Ages 2-4", "Ages 11-12",],
-            ("Animated",): ["Family Animation", "Cartoons"]
             }
 
         for entry in resp["data"]:
