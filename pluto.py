@@ -201,8 +201,6 @@ class Client:
                     offset = 8000
                     if number < offset:
                         number += offset
-                case _:
-                    pass
             while number in seen:
                 number += 1
             seen.add(number)
