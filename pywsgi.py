@@ -17,7 +17,7 @@ updated_date = "Jan. 18, 2025"
 # Fallback to default if invalid or unspecified
 try:
     port = int(os.environ.get("PLUTO_PORT", 7777))
-except:
+except (TypeError, ValueError):
     port = 7777
 
 pluto_country_list = os.environ.get("PLUTO_CODE")
@@ -135,7 +135,7 @@ def playlist(provider, country_code):
     elif country_code.lower() in ALLOWED_COUNTRY_CODES:
         stations, err = providers[provider].channels(country_code)
     else: # country_code not in ALLOWED_COUNTRY_CODES
-        return "Invalid county code", 400
+        return "Invalid country code", 400
 
     host = request.host
     channel_id_format = request.args.get('channel_id_format','').lower()
@@ -246,7 +246,7 @@ def epg_xml(provider, country_code, filename):
     # file_path = 'epg.xml'
     try:
         if country_code not in ALLOWED_COUNTRY_CODES:
-            return "Invalid county code", 400
+            return "Invalid country code", 400
 
         # Check if the provided filename is allowed in either format
         if filename not in ALLOWED_EPG_FILENAMES and filename not in ALLOWED_GZ_FILENAMES:
@@ -266,11 +266,6 @@ def epg_xml(provider, country_code, filename):
     except FileNotFoundError:
         # Handle the case where the file is not found
         return "XML file not found", 404
-    except Exception as e:
-        # Handle other unexpected errors
-        return f"An error occurred: {str(e)}", 500
-
-
     except Exception as e:
         # Handle other unexpected errors
         return f"An error occurred: {str(e)}", 500
@@ -314,6 +309,7 @@ def monitor_thread(thread_func):
     while True:
         if not thread.is_alive():
             print("[ERROR] Scheduler Thread Stopped. Restarting...")
+            thread = Thread(target=thread_func, daemon=True)
             thread.start()
         time.sleep(15 * 60)  # Check every 15 minutes
         print("[INFO] Checking Scheduler Thread")
